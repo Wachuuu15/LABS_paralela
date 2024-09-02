@@ -4,8 +4,11 @@
 #include <ctime>   
 #include <string>
 #include <sstream>
+#include <chrono>
+#include <sys/stat.h> 
 
 using namespace std;
+using namespace chrono; 
 
 // Función para comparar dos números
 int compare (const void * a, const void * b) {
@@ -20,9 +23,16 @@ int main() {
     cin >> N;
 
     // generación de números aleatorios y escritura en un archivo
-    ofstream outFile("numeros.csv");
+    const char* folderName = "SECUENCIAL";
+    mkdir(folderName, 0777); 
+
+    string outputFile1 = string(folderName) + "/numeros.csv";
+    string outputFile2 = string(folderName) + "/numeros_ordenados.csv";
+
+    // Generación de números aleatorios y escritura en un archivo
+    ofstream outFile(outputFile1);
     if (!outFile) {
-        cerr << "No se pudo crear el archivo numeros.csv" << endl;
+        cerr << "No se pudo crear el archivo " << outputFile1 << endl;
         return 1;
     }
 
@@ -36,9 +46,9 @@ int main() {
     outFile.close();
 
     // lectura de números desde el archivo y almacenamiento en memoria
-    ifstream inFile("numeros.csv");
+    ifstream inFile(outputFile1);
     if (!inFile) {
-        cerr << "No se pudo leer el archivo numeros.csv" << endl;
+        cerr << "No se pudo leer el archivo " << outputFile1 << endl;
         return 1;
     }
 
@@ -54,13 +64,18 @@ int main() {
         Array[index++] = stoi(temp); // se almacena en el arreglo
     }
 
+    // Medir el tiempo de clasificación
+    auto start = high_resolution_clock::now();
+
     // Classifed
     qsort(Array, N, sizeof(int), compare); 
 
-    
-    ofstream sortedFile("numeros_ordenados.csv");
+    auto stop = high_resolution_clock::now();
+    auto duration = duration_cast<microseconds>(stop - start);
+
+    ofstream sortedFile(outputFile2);
     if (!sortedFile) {
-        cerr << "No se pudo crear el archivo numeros_ordenados.csv" << endl;
+        cerr << "No se pudo crear el archivo " << outputFile2 << endl;
         delete[] Array; // Liberar memoria
         return 1;
     }
@@ -77,6 +92,8 @@ int main() {
     delete[] Array;
 
     cout << "Los números aleatorios se han generado, clasificado y guardado en numeros_ordenados.csv" << endl;
+    cout << "Tiempo de clasificación: " << duration.count() << " microsegundos." << endl;
+
 
     return 0;
 }
