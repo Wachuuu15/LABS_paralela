@@ -14,13 +14,10 @@ using namespace chrono;
 void quickSortParallel(int* array, int left, int right, int depth = 0) {
     if (left < right) {
         int pivot = array[(left + right) / 2];
-        int i = left;
-        int j = right;
-
+        int i = left, j = right;
         while (i <= j) {
             while (array[i] < pivot) i++;
             while (array[j] > pivot) j--;
-
             if (i <= j) {
                 swap(array[i], array[j]);
                 i++;
@@ -28,11 +25,9 @@ void quickSortParallel(int* array, int left, int right, int depth = 0) {
             }
         }
 
-        // Limitar la profundidad de la recursión paralela
         if (depth < 4) {
             #pragma omp task
             quickSortParallel(array, left, j, depth + 1);
-
             #pragma omp task
             quickSortParallel(array, i, right, depth + 1);
         } else {
@@ -46,9 +41,7 @@ void quickSort(int* array, int len) {
     #pragma omp parallel
     {
         #pragma omp single nowait
-        {
-            quickSortParallel(array, 0, len - 1);
-        }
+        quickSortParallel(array, 0, len - 1);
     }
 }
 
@@ -65,18 +58,21 @@ int main() {
     string outputFile1 = string(folderName) + "/numeros.csv";
     string outputFile2 = string(folderName) + "/numeros_ordenados.csv";
 
-    // Generación de números aleatorios y escritura en un archivo
     ofstream outFile(outputFile1);
     if (!outFile) {
         cerr << "No se pudo crear el archivo " << outputFile1 << endl;
         return 1;
     }
 
+    #pragma omp parallel for
     for (int i = 0; i < N; i++) {
-        int num = rand() % 100;
-        outFile << num;
-        if (i < N - 1) {
-            outFile << ",";
+        int num = rand() % 100;  // Notar que rand() no es thread-safe
+        #pragma omp critical
+        {
+            outFile << num;
+            if (i < N - 1) {
+                outFile << ",";
+            }
         }
     }
     outFile.close();
@@ -86,7 +82,6 @@ int main() {
         cerr << "No se pudo leer el archivo " << outputFile1 << endl;
         return 1;
     }
-
 
     int *Array = new int[N];
     string line;
@@ -100,8 +95,6 @@ int main() {
         Array[index++] = stoi(temp);
     }
 
-
-    // Medir el tiempo de clasificación
     auto start = high_resolution_clock::now();
 
     quickSort(Array, N);

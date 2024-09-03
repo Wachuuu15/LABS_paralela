@@ -6,6 +6,8 @@
 #include <sstream>
 #include <chrono>
 #include <sys/stat.h> 
+#include <vector>      // Necesario para usar std::vector
+#include <numeric>     // Necesario para usar std::accumulate
 
 using namespace std;
 using namespace chrono; 
@@ -29,7 +31,6 @@ int main() {
     string outputFile1 = string(folderName) + "/numeros.csv";
     string outputFile2 = string(folderName) + "/numeros_ordenados.csv";
 
-    // Generación de números aleatorios y escritura en un archivo
     ofstream outFile(outputFile1);
     if (!outFile) {
         cerr << "No se pudo crear el archivo " << outputFile1 << endl;
@@ -45,7 +46,6 @@ int main() {
     }
     outFile.close();
 
-    // lectura de números desde el archivo y almacenamiento en memoria
     ifstream inFile(outputFile1);
     if (!inFile) {
         cerr << "No se pudo leer el archivo " << outputFile1 << endl;
@@ -93,7 +93,6 @@ int main() {
 
     cout << "Los números aleatorios se han generado, clasificado y guardado en numeros_ordenados.csv" << endl;
     cout << "Tiempo de clasificación: " << duration.count() << " microsegundos." << endl;
-
 
     return 0;
 }
