@@ -1,3 +1,9 @@
+// Universidad Del Valle de Guatemala
+// Departamento de computación
+// Computación paralela y distribuida
+// Diana Lucía Fernández Villatoro - 21747
+// Jennifer Michelle Toxcón Ordoñez - 21276
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
